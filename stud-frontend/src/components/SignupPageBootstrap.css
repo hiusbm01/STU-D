@@ -1,0 +1,17 @@
+.form-signup-container {
+    display: flex;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    background-color: #f5f5f5;
+    hbeight: calc(100vh - 70px);
+}
+
+.form-signup {
+    max-width: 330px;
+    padding: 15px;
+}
+
+.form-signup .form-floating:focus-within {
+    z-index:2;
+}

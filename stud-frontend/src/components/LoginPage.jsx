@@ -1,13 +1,15 @@
 import React, { useState} from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,Link } from 'react-router-dom';
 import useUserStore from '../store/userStore';
-import './LoginPage.css';
+
+import { Button, TextField, Box, Typography, Container} from '@mui/material';
 
 function LoginPage(){
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const {login} = useUserStore();
 
     //로그인 버튼 클릭 시 실행될 함수
     const handleLoginSubmit = async (event) =>{
@@ -33,17 +35,57 @@ function LoginPage(){
 
 
     return(
-        <div className="login-container">
-            <h1>로그인</h1>
-            <form className="login-form" onSubmit={handleLoginSubmit}>
-                <input type="email" placeholder="이메일을 입력하세요" value={email} onChange={(e) => setEmail(e.target.value)}></input>
-                <input type="password" placeholder="비밀번호를 입력하세요" value={password} onChange={(e) => setPassword(e.target.value)}></input>
-                <button type="submit">로그인</button>
-            </form>
-            <div className="signup-link">
-                아직 회원이 아니신가요? <a href="#">회원가입</a>
-            </div>
-        </div>
+      <Container component="main" maxWidth="xs">
+        <Box
+            sx={{
+                marginTop: 8,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+            }}
+        >
+            <Typography component="h1" variant="h5">
+                로그인
+            </Typography>
+            <Box component="form" onSubmit={handleLoginSubmit} sx={{mt: 1}}>
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="email"
+                    label="이메일 주소"
+                    name="email"
+                    autoComplete="email"
+                    autoFocus
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <TextField
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="password"
+                    label="비밀번호"
+                    type="password"
+                    id="password"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+                <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt:3, mb: 2}}
+                
+                >로그인
+                </Button>
+                <Typography variant ="body2" align="center">
+                    아직 회원이 아니신가요? <Link to="/signup">회원가입</Link>
+                </Typography>
+            </Box>
+        </Box>
+      </Container>
     )
 }
 
