@@ -1,18 +1,22 @@
 package com.stud.backend.service;
 
-import com.stud.backend.domain.Seat;
-import com.stud.backend.domain.SeatStatus;
-import com.stud.backend.domain.User;
+import com.stud.backend.domain.*;
 import com.stud.backend.dto.SeatDto;
+import com.stud.backend.dto.SeatUsageHistoryDto;
 import com.stud.backend.repository.SeatRepository;
+import com.stud.backend.repository.SeatUsageHistoryRepository;
 import com.stud.backend.repository.UserRepository;
+import com.stud.backend.repository.UserTicketRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,7 +26,8 @@ public class SeatService {
 
     private final SeatRepository seatRepository;
     private final UserRepository userRepository;
-
+    private final UserTicketRepository userTicketRepository;
+    private final SeatUsageHistoryRepository seatUsageHistoryRepository;
 
     @PostConstruct
     public void initSeats(){
@@ -51,6 +56,12 @@ public class SeatService {
         //요청 보낸 사용자 DB 조회
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
+
+        //ACTIVE 이용권이 있는지 확인
+        List<UserTicket> activeTickets = userTicketRepository.findByUserAndStatus(user, UserTicketStatus.ACTIVE);
+        if(activeTickets.isEmpty()){
+            throw new IllegalStateException("사용 가능한 이용권이 없습니다. 이용권을 구매하시겠습니까?");
+        }
         //사용자가 다른 좌석을 사용중인지 확인
         seatRepository.findByUserAndStatus(user,SeatStatus.OCCUPIED)
                 .ifPresent(existingSeat ->{
@@ -70,16 +81,50 @@ public class SeatService {
     }
     //예약 취소
     public void checkout(String userEmail){
-        User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다"));
+       User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new IllegalArgumentException("현재 사용중인 좌석이 없습니다."));
 
-        Seat seat = seatRepository.findByUserAndStatus(user, SeatStatus.OCCUPIED)
-                .orElseThrow(() -> new IllegalStateException("현재 예약된 좌석이 없습니다"));
+       //사용자 사용중인 좌석 찾기
+        Seat seat = seatRepository.findByUserAndStatus(user, SeatStatus.OCCUPIED).orElseThrow(() -> new IllegalStateException("현재 사용중인 좌석이 없습니다."));
 
+        //사용자가 사용중인 'ACTIVE'상태 이용권 찾기
+        UserTicket activeUserTicket = userTicketRepository.findByUserAndStatus(user, UserTicketStatus.ACTIVE).stream()
+                .findFirst()
+                .orElse(null);
+        //이용 기록 생성 및 저장
+        SeatUsageHistory history = new SeatUsageHistory();
+        history.setUser(user);
+        history.setSeatNumber(seat.getSeatNumber());
+        history.setCheckInTime(seat.getStartTime());
+        history.setCheckOutTime(LocalDateTime.now());
+
+        long duration = Duration.between(seat.getStartTime(), history.getCheckOutTime()).toMinutes();
+        history.setDurationMinutes(duration);
+
+        seatUsageHistoryRepository.save(history);
+
+        //사용 시간 계산 및 이용권 시간 차감
+        if(activeUserTicket != null && activeUserTicket.getTicket().getType() != TicketType.PERIOD){
+            LocalDateTime startTime = seat.getStartTime();
+            LocalDateTime now = LocalDateTime.now();
+
+            long usedMinutes = Duration.between(startTime, now).toMinutes();
+
+            int remainingTime = activeUserTicket.getRemainingTime();
+            activeUserTicket.setRemainingTime(remainingTime - (int) usedMinutes);
+
+            if( activeUserTicket.getRemainingTime() <= 0){
+                activeUserTicket.setStatus(UserTicketStatus.USED);
+            }
+        }
+        // 좌석 정보 초기화
         seat.setStatus(SeatStatus.AVAILABLE);
         seat.setUser(null);
         seat.setStartTime(null);
         seat.setEndTime(null);
+        //@Transactional에 의해 변경된 Seat와 UserTicket의 정보가 자동으로 DB저장.
+
+
+
     }
 
     //내 예약 찾기
@@ -93,6 +138,56 @@ public class SeatService {
                 .map(SeatDto::new)//좌석이 있으면 SeatDto로 반환, 없으면 null
                 .orElse(null);
     }
+
+    @Scheduled(fixedRate = 60000)//1분마다 이 메서드 실행
+    @Transactional
+    public void autoCheckoutExpiredSeats(){
+        System.out.println("만료된 좌석을 확인합니다." + LocalDateTime.now());
+
+        List<Seat> expiredSeats = seatRepository.findByStatusAndEndTimeBefore(SeatStatus.OCCUPIED, LocalDateTime.now());
+
+        if(!expiredSeats.isEmpty()){
+            System.out.println(expiredSeats.size() + "개의 만료된 좌석을 발견하여 퇴실처리합니다.");
+            for(Seat seat : expiredSeats){
+                User user = seat.getUser();
+                if(user != null){
+                    UserTicket activeTicket = userTicketRepository.findByUserAndStatus(user, UserTicketStatus.ACTIVE)
+                            .stream().findFirst().orElse(null);
+
+                    if(activeTicket != null && activeTicket.getTicket().getType() != TicketType.PERIOD){
+                        activeTicket.setRemainingTime(0);
+                        activeTicket.setStatus(UserTicketStatus.USED);
+                    }
+                    seat.setStatus(SeatStatus.AVAILABLE);
+                    seat.setUser(null);
+                    seat.setStartTime(null);
+                    seat.setEndTime(null);
+                }
+            }
+        }
+
+
+
+    }
+
+    @Transactional(readOnly = true)
+    public List<SeatUsageHistoryDto> getMySeatUsageHistory(String userEmail){
+        User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        List<SeatUsageHistory> histories = seatUsageHistoryRepository.findByUser(user);
+
+        return histories.stream()
+                .map(SeatUsageHistoryDto::new)
+                .collect(Collectors.toList());
+
+    }
+    public Optional<SeatDto> getMyActiveSeat(String userEmail){
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다"));
+        return seatRepository.findByUserAndStatus(user, SeatStatus.OCCUPIED)
+                .map(SeatDto::new);
+    }
+
 
 
 }

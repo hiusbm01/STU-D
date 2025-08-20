@@ -1,5 +1,5 @@
 import React, { useState} from 'react';
-import axios from 'axios';
+import apiClient from '../api/api';
 import { useNavigate,Link } from 'react-router-dom';
 import useUserStore from '../store/userStore';
 
@@ -16,16 +16,9 @@ function LoginPage(){
         event.preventDefault();
 
         try{
-            const response = await axios.post('http://localhost:8080/api/users/login',{
-                email: email,
-                password: password,
-            });
-            const token = response.data.token;
-            login({ email: email}, token);
-
-            alert('로그인 성공!');
-            console.log('받아온 토큰: ',token);
-
+            const response = await apiClient.post('/users/login',{
+               email, password });
+            login({email:email}, response.data.token);
             navigate('/');
         } catch(error){
             alert('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');

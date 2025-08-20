@@ -53,3 +53,7 @@
     display: flex;
     align-items: center;
 }
+
+.history-title {
+    margin-top: 40px;
+}

@@ -1,6 +1,7 @@
 package com.stud.backend.controller;
 
 import com.stud.backend.dto.SeatDto;
+import com.stud.backend.dto.SeatUsageHistoryDto;
 import com.stud.backend.service.SeatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +47,18 @@ public class SeatController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(myReservation);
+    }
+    @GetMapping("/history")
+    public ResponseEntity<List<SeatUsageHistoryDto>> getmySeatUsageHistory(@AuthenticationPrincipal UserDetails userDetails){
+        List<SeatUsageHistoryDto> history = seatService.getMySeatUsageHistory(userDetails.getUsername());
+        return ResponseEntity.ok(history);
+    }
+
+    @GetMapping("/my-seat")
+    public ResponseEntity<SeatDto> getMyActiveSeat(@AuthenticationPrincipal UserDetails userDetails){
+        return seatService.getMyActiveSeat(userDetails.getUsername())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
     }
 
 
