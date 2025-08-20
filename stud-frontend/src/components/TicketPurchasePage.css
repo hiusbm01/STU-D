@@ -1,0 +1,40 @@
+.ticket-purchase-container{
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.ticket-grid{
+    display: gird;
+    /* 한줄에 3개 카드, 너비 동일 */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.ticket-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    /* 그림자효과 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+}
+
+.ticket-card h3{
+    margin-top: 0;
+    color: #0056b3;
+}
+
+.ticket-card p{
+    margin: 10px 0;
+    font-size: 16px;
+    color: #333;
+
+}
+
+.ticket-card .price{
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    
+}

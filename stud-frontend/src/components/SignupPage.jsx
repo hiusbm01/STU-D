@@ -40,7 +40,7 @@ function SignupPage(){
         }
 
         try{
-            await axios.post('/api/users/register', {
+            await axios.post('http://localhost:8080/api/users/register', {
                 name,
                 email,
                 password,

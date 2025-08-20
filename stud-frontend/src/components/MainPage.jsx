@@ -14,8 +14,8 @@ function MainPage(){
             <p>원하시는 서비스를 선택해주세요.</p>
             <div className="main-menu">
                 <button onClick={() => navigate('/seats')}>좌석 예약</button>
-                <button>이용권 구매</button>
-                <button>마이페이지</button>
+                <button onClick={() => navigate('/tickets')}>이용권 구매</button>
+                <button onClick={() => navigate('/mypage')}>마이페이지</button>
             </div>
         </div>
     );

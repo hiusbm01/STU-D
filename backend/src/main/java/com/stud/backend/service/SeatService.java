@@ -69,7 +69,7 @@ public class SeatService {
 
     }
     //예약 취소
-    public void cancelReservation(String userEmail){
+    public void checkout(String userEmail){
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다"));
 

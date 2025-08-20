@@ -32,10 +32,10 @@ public class SeatController {
         return ResponseEntity.ok("좌석 예약에 성공했습니다.");
     }
 
-    @PostMapping("/cancel")
-    public ResponseEntity<String> cancelReservation(@AuthenticationPrincipal UserDetails userDetails){
-        seatService.cancelReservation(userDetails.getUsername());
-        return ResponseEntity.ok("좌석 예약이 취소되었습니다.");
+    @PostMapping("/checkout")
+    public ResponseEntity<String> checkout(@AuthenticationPrincipal UserDetails userDetails){
+        seatService.checkout(userDetails.getUsername());
+        return ResponseEntity.ok("정상적으로 퇴실 처리 되었습니다.");
     }
     @GetMapping("/my")
     public ResponseEntity<?> getMyReservation(@AuthenticationPrincipal UserDetails userDetails){
