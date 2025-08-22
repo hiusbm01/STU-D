@@ -4,6 +4,7 @@ import { useNavigate,Link } from 'react-router-dom';
 import useUserStore from '../store/userStore';
 
 import { Button, TextField, Box, Typography, Container} from '@mui/material';
+import {toast} from 'react-toastify';
 
 function LoginPage(){
     const [email, setEmail] = useState('');
@@ -19,9 +20,12 @@ function LoginPage(){
             const response = await apiClient.post('/users/login',{
                email, password });
             login({email:email}, response.data.token);
+            
+            toast.success('로그인에 성공했습니다.');
+
             navigate('/');
         } catch(error){
-            alert('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+            toast.error('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
             console.error('로그인 에러:', error);
         }
     };

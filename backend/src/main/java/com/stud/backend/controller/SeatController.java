@@ -1,5 +1,6 @@
 package com.stud.backend.controller;
 
+import com.stud.backend.dto.CheckoutResponseDto;
 import com.stud.backend.dto.SeatDto;
 import com.stud.backend.dto.SeatUsageHistoryDto;
 import com.stud.backend.service.SeatService;
@@ -34,9 +35,9 @@ public class SeatController {
     }
 
     @PostMapping("/checkout")
-    public ResponseEntity<String> checkout(@AuthenticationPrincipal UserDetails userDetails){
-        seatService.checkout(userDetails.getUsername());
-        return ResponseEntity.ok("정상적으로 퇴실 처리 되었습니다.");
+    public ResponseEntity<CheckoutResponseDto> checkout(@AuthenticationPrincipal UserDetails userDetails){
+        CheckoutResponseDto responseDto = seatService.checkout(userDetails.getUsername());
+        return ResponseEntity.ok(responseDto);
     }
     @GetMapping("/my")
     public ResponseEntity<?> getMyReservation(@AuthenticationPrincipal UserDetails userDetails){

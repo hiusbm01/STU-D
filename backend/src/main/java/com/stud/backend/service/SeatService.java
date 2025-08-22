@@ -1,8 +1,10 @@
 package com.stud.backend.service;
 
 import com.stud.backend.domain.*;
+import com.stud.backend.dto.CheckoutResponseDto;
 import com.stud.backend.dto.SeatDto;
 import com.stud.backend.dto.SeatUsageHistoryDto;
+import com.stud.backend.dto.UserTicketDto;
 import com.stud.backend.repository.SeatRepository;
 import com.stud.backend.repository.SeatUsageHistoryRepository;
 import com.stud.backend.repository.UserRepository;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,14 +60,13 @@ public class SeatService {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
 
-        //ACTIVE 이용권이 있는지 확인
-        List<UserTicket> activeTickets = userTicketRepository.findByUserAndStatus(user, UserTicketStatus.ACTIVE);
-        if(activeTickets.isEmpty()){
-            throw new IllegalStateException("사용 가능한 이용권이 없습니다. 이용권을 구매하시겠습니까?");
-        }
+        UserTicket ticketToUse = userTicketRepository.findByUserAndStatus(user, UserTicketStatus.ACTIVE)
+                        .stream()
+                                .min(Comparator.comparing(UserTicket::getPurchaseDate))
+                                        .orElseThrow(() -> new IllegalStateException("사용 가능한 이용권이 없습니다."));
         //사용자가 다른 좌석을 사용중인지 확인
         seatRepository.findByUserAndStatus(user,SeatStatus.OCCUPIED)
-                .ifPresent(existingSeat ->{
+                .stream().findFirst().ifPresent(existingSeat ->{
                     throw new IllegalStateException("이미 예약한 좌석이 있습니다." +existingSeat.getSeatNumber());
                 });
 
@@ -75,21 +77,21 @@ public class SeatService {
         //좌석 정보 업데이트
         seat.setStatus(SeatStatus.OCCUPIED); //상태 사용중으로 변경
         seat.setUser(user); //좌석에 사용자 정보 연결
+        seat.setUserTicket(ticketToUse);
         seat.setStartTime(LocalDateTime.now()); //시작 시간 기록
         seat.setEndTime(LocalDateTime.now().plusHours(2)); //2시간 후를 종료 시간으로 설정 (임시)
 
     }
-    //예약 취소
-    public void checkout(String userEmail){
-       User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new IllegalArgumentException("현재 사용중인 좌석이 없습니다."));
+    //퇴실
+    public CheckoutResponseDto checkout(String userEmail){
+       User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
 
        //사용자 사용중인 좌석 찾기
-        Seat seat = seatRepository.findByUserAndStatus(user, SeatStatus.OCCUPIED).orElseThrow(() -> new IllegalStateException("현재 사용중인 좌석이 없습니다."));
+        Seat seat = seatRepository.findByUserAndStatus(user, SeatStatus.OCCUPIED).stream().findFirst().orElseThrow(() -> new IllegalStateException("현재 사용중인 좌석이 없습니다."));
+
 
         //사용자가 사용중인 'ACTIVE'상태 이용권 찾기
-        UserTicket activeUserTicket = userTicketRepository.findByUserAndStatus(user, UserTicketStatus.ACTIVE).stream()
-                .findFirst()
-                .orElse(null);
+        UserTicket activeUserTicket = seat.getUserTicket();
         //이용 기록 생성 및 저장
         SeatUsageHistory history = new SeatUsageHistory();
         history.setUser(user);
@@ -104,13 +106,9 @@ public class SeatService {
 
         //사용 시간 계산 및 이용권 시간 차감
         if(activeUserTicket != null && activeUserTicket.getTicket().getType() != TicketType.PERIOD){
-            LocalDateTime startTime = seat.getStartTime();
-            LocalDateTime now = LocalDateTime.now();
-
-            long usedMinutes = Duration.between(startTime, now).toMinutes();
 
             int remainingTime = activeUserTicket.getRemainingTime();
-            activeUserTicket.setRemainingTime(remainingTime - (int) usedMinutes);
+            activeUserTicket.setRemainingTime(remainingTime - (int) duration);
 
             if( activeUserTicket.getRemainingTime() <= 0){
                 activeUserTicket.setStatus(UserTicketStatus.USED);
@@ -124,6 +122,7 @@ public class SeatService {
         //@Transactional에 의해 변경된 Seat와 UserTicket의 정보가 자동으로 DB저장.
 
 
+        return new CheckoutResponseDto(duration, activeUserTicket);
 
     }
 
@@ -135,7 +134,7 @@ public class SeatService {
 
         //사용자가 사용중인 좌석을 찾아 DTO로 변환하여 반환
         return seatRepository.findByUserAndStatus(user, SeatStatus.OCCUPIED)
-                .map(SeatDto::new)//좌석이 있으면 SeatDto로 반환, 없으면 null
+                .stream().findFirst().map(SeatDto::new)//좌석이 있으면 SeatDto로 반환, 없으면 null
                 .orElse(null);
     }
 
@@ -185,9 +184,40 @@ public class SeatService {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다"));
         return seatRepository.findByUserAndStatus(user, SeatStatus.OCCUPIED)
-                .map(SeatDto::new);
+                .stream().findFirst().map(SeatDto::new);
     }
 
+    //자리 이동 메소드
+    public void changeSeat(Long newSeatId, String userEmail){
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
+
+        //1. 현재 사용중 좌석 찾음
+        Seat oldSeat = seatRepository.findByUserAndStatus(user, SeatStatus.OCCUPIED)
+                .stream().findFirst().orElseThrow(()-> new IllegalStateException("현재 사용중인 좌석이 없습니다."));
+
+        //옮길 좌석 찾기
+        Seat newSeat = seatRepository.findById(newSeatId)
+                .orElseThrow(()-> new IllegalArgumentException("옮길 좌석이 존재하지 않습니다."));
+
+        //사용 가능한지 확인
+        if(newSeat.getStatus() != SeatStatus.AVAILABLE){
+            throw new IllegalStateException("이미 사용중이거나 예약 불가능한 좌석입니다.");
+        }
+        //기존 좌석 비우고 새로운 좌석에 정보 그대로 옮기기
+
+        newSeat.setStatus(SeatStatus.OCCUPIED);
+        newSeat.setUser(user);
+        newSeat.setStartTime(oldSeat.getStartTime());
+        newSeat.setEndTime(oldSeat.getEndTime());
+        newSeat.setUserTicket(oldSeat.getUserTicket());
+
+        oldSeat.setStatus(SeatStatus.AVAILABLE);
+        oldSeat.setUser(null);
+        oldSeat.setStartTime(null);
+        oldSeat.setEndTime(null);
+        oldSeat.setUserTicket(null);
+    }
 
 
 }

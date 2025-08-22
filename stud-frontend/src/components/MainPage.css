@@ -25,3 +25,13 @@
     background-color: #007bff;
     color:white;
 }
+
+.main-menu .checkout-btn {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.main-menu .checkout-btn:hover {
+    background-color: #dc3545;
+    color: white;
+}

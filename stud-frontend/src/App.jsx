@@ -8,6 +8,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import SignupPage from './components/SignupPage';
 import TicketPurchasePage from './components/TicketPurchasePage';
 import MyPage from './components/MyPage';
+import {ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App(){
   return (
@@ -29,6 +31,13 @@ function App(){
           <Route path="/tickets" element={<ProtectedRoute><TicketPurchasePage/></ProtectedRoute>}/>
         </Routes>
       </main>
+      <ToastContainer position="bottom-right"
+                      autoClose={3000}
+                      hideProgressBar={false}
+                      closeOnClick
+                      pauseOnHover
+                      theme="light"
+      />
     </div>
   );
 }

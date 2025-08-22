@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface SeatRepository extends JpaRepository<Seat, Long> {
 
     //사용자가 사용중인 좌석 찾는 메서드
-    Optional<Seat> findByUserAndStatus(User user, SeatStatus status);
+    List<Seat> findByUserAndStatus(User user, SeatStatus status);
 
     //이용중 시간이 만료된 좌석 퇴실처리
     List<Seat> findByStatusAndEndTimeBefore(SeatStatus status, LocalDateTime now);
