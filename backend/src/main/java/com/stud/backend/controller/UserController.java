@@ -23,12 +23,7 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@Valid @RequestBody UserRegisterDto userRegisterDto){
         try{
-            userService.registerUser(
-                    userRegisterDto.getEmail(),
-                    userRegisterDto.getPassword(),
-                    userRegisterDto.getName(),
-                    userRegisterDto.getPhoneNumber()
-            );
+            userService.registerUser(userRegisterDto);
             return new ResponseEntity<>("회원가입에 성공했습니다.", HttpStatus.CREATED);
         }catch (IllegalArgumentException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);

@@ -1,16 +1,15 @@
 package com.stud.backend.service;
 
 import com.stud.backend.domain.*;
-import com.stud.backend.dto.CheckoutResponseDto;
-import com.stud.backend.dto.SeatDto;
-import com.stud.backend.dto.SeatUsageHistoryDto;
-import com.stud.backend.dto.UserTicketDto;
+import com.stud.backend.dto.*;
+import com.stud.backend.exception.TicketNotFoundException;
 import com.stud.backend.repository.SeatRepository;
 import com.stud.backend.repository.SeatUsageHistoryRepository;
 import com.stud.backend.repository.UserRepository;
 import com.stud.backend.repository.UserTicketRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +30,13 @@ public class SeatService {
     private final UserRepository userRepository;
     private final UserTicketRepository userTicketRepository;
     private final SeatUsageHistoryRepository seatUsageHistoryRepository;
+    private final SimpMessagingTemplate messagingTemplate;
+
+    private void broadcastSeatUpdate(){
+        List<SeatDto> seats = getAllSeats();
+        messagingTemplate.convertAndSend("/topic/seats", seats);
+    }
+
 
     @PostConstruct
     public void initSeats(){
@@ -63,7 +69,7 @@ public class SeatService {
         UserTicket ticketToUse = userTicketRepository.findByUserAndStatus(user, UserTicketStatus.ACTIVE)
                         .stream()
                                 .min(Comparator.comparing(UserTicket::getPurchaseDate))
-                                        .orElseThrow(() -> new IllegalStateException("사용 가능한 이용권이 없습니다."));
+                                        .orElseThrow(() -> new TicketNotFoundException("사용 가능한 이용권이 없습니다."));
         //사용자가 다른 좌석을 사용중인지 확인
         seatRepository.findByUserAndStatus(user,SeatStatus.OCCUPIED)
                 .stream().findFirst().ifPresent(existingSeat ->{
@@ -80,6 +86,8 @@ public class SeatService {
         seat.setUserTicket(ticketToUse);
         seat.setStartTime(LocalDateTime.now()); //시작 시간 기록
         seat.setEndTime(LocalDateTime.now().plusHours(2)); //2시간 후를 종료 시간으로 설정 (임시)
+
+        broadcastSeatUpdate();
 
     }
     //퇴실
@@ -121,6 +129,7 @@ public class SeatService {
         seat.setEndTime(null);
         //@Transactional에 의해 변경된 Seat와 UserTicket의 정보가 자동으로 DB저장.
 
+        broadcastSeatUpdate();
 
         return new CheckoutResponseDto(duration, activeUserTicket);
 
@@ -163,7 +172,9 @@ public class SeatService {
                     seat.setEndTime(null);
                 }
             }
+            broadcastSeatUpdate();
         }
+
 
 
 
@@ -217,6 +228,27 @@ public class SeatService {
         oldSeat.setStartTime(null);
         oldSeat.setEndTime(null);
         oldSeat.setUserTicket(null);
+    }
+
+    //메인메뉴 좌석개수 띄우기
+    @Transactional(readOnly = true)
+    public DashboardDto getDashboardInfo() {
+        long totalSeats = seatRepository.count();
+        long occupiedSeats = seatRepository.countByStatus(SeatStatus.OCCUPIED);
+        long availableSeats = totalSeats - occupiedSeats;
+
+        return new DashboardDto(totalSeats, occupiedSeats, availableSeats);
+    }
+
+
+    //대시보드 용 최근 기록 1개 가져오는 메서드
+    @Transactional(readOnly = true)
+    public Optional<SeatUsageHistoryDto> getMyRecentUsageHistory(String userEmail){
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다"));
+
+        return seatUsageHistoryRepository.findFirstByUserOrderByCheckOutTimeDesc(user)
+                .map(SeatUsageHistoryDto::new);
     }
 
 

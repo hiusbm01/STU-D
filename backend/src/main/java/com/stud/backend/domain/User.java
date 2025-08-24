@@ -31,7 +31,7 @@ public class User {
     private String phoneNumber;
 
     //사용자 권한
-    @Enumerated(EnumType.STRING) // enum타입을 데이터베이스에 문자열 형태로 젖아하도록
+    @Enumerated(EnumType.STRING) // enum타입을 데이터베이스에 문자열 형태로 저장하도록
     @Column(name = "role", nullable = false, length = 20)
     private Role role;
 

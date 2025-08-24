@@ -2,6 +2,7 @@ package com.stud.backend.service;
 
 import com.stud.backend.domain.User;
 import com.stud.backend.domain.User.Role;
+import com.stud.backend.dto.UserRegisterDto;
 import com.stud.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,21 +22,22 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
+
+
     @Transactional
-    public User registerUser(String email, String password, String name, String phoneNumber){
-        if(userRepository.existsByEmail(email)){
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+    public User registerUser(UserRegisterDto userDto){
+        if(userRepository.existsByEmail(userDto.getEmail())){
+            throw new IllegalArgumentException("이미 사용중인 이메일입니다.");
         }
 
-        //비밀번호 암호화
-        String encodedPassword = passwordEncoder.encode(password);
+        String encodedPassword = passwordEncoder.encode(userDto.getPassword());
 
         User newUser = User.builder()
-                .email(email)
+                .email(userDto.getEmail())
                 .password(encodedPassword)
-                .name(name)
-                .phoneNumber(phoneNumber)
-                .role(Role.ROLE_USER)
+                .name(userDto.getName())
+                .phoneNumber(userDto.getPhoneNumber())
+                .role(User.Role.ROLE_USER)
                 .build();
 
         return userRepository.save(newUser);

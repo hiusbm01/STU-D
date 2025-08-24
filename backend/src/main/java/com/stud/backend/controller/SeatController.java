@@ -1,6 +1,7 @@
 package com.stud.backend.controller;
 
 import com.stud.backend.dto.CheckoutResponseDto;
+import com.stud.backend.dto.DashboardDto;
 import com.stud.backend.dto.SeatDto;
 import com.stud.backend.dto.SeatUsageHistoryDto;
 import com.stud.backend.service.SeatService;
@@ -61,6 +62,20 @@ public class SeatController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
     }
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<DashboardDto> getDashboardInfo(){
+        DashboardDto dashboardInfo = seatService.getDashboardInfo();
+        return ResponseEntity.ok(dashboardInfo);
+    }
+
+    @GetMapping("/history/recent")
+    public ResponseEntity<SeatUsageHistoryDto> getMyRecentSeatUsageHistory(@AuthenticationPrincipal UserDetails userDetails){
+        return seatService.getMyRecentUsageHistory(userDetails.getUsername())
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
+
 
 
 }

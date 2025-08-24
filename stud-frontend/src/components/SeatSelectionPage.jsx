@@ -3,8 +3,11 @@ import apiClient from '../api/api';
 import useUserStore from '../store/userStore';
 import './SeatSelectionPage.css';
 import {toast} from 'react-toastify';
+import {useNavigate} from 'react-router-dom';
 import {Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button} from '@mui/material';
 
+import {Client} from '@stomp/stompjs';
+import SockJS from 'sockjs-client/dist/sockjs';
 
 const calculatedRemainingTime = (endTimeString) =>{
     if (!endTimeString) return '';
@@ -29,6 +32,7 @@ function SeatSelectionPage(){
      const [activeSeat, setActiveSeat] = useState(null);
      const [openConfirm, setOpenConfirm] = useState(false);
      const [selectedSeat, setSelectedSeat] = useState(null);
+     const navigate = useNavigate;
     //  const {token, user} ==> 리액트 무한루프.. 이유?
 
     const fetchSeats = useCallback(async () => {
@@ -46,8 +50,39 @@ function SeatSelectionPage(){
     }, [])
     
     useEffect(() => {
-        fetchSeats();
-    }, [fetchSeats]);
+        const fetchInitialSeats = async () => {
+            try{
+                const response = await apiClient.get('/seats');
+                setSeats(response.data);
+            }catch(error){
+                console.error('초기 좌석 정보를 불러오는데 실패했습니다', error);
+            }
+        };
+        fetchInitialSeats();
+
+
+        const stompClient = new Client({
+            webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+
+            onConnect: () => {
+                console.log('웹소켓 연결 완료');
+
+                stompClient.subscribe('/topic/seats', (message) => {
+                    const receivedSeats = JSON.parse(message.body);
+                    setSeats(receivedSeats);
+                });
+            },
+            onStompError: (frame) => {
+                console.error('STOMP에러 :', error);
+            },
+        });
+        stompClient.activate();
+
+        return () => {
+            stompClient.deactivate();
+            console.log('웹소켓 연결 해제');
+        }
+    }, []);
 
     //좌석 클릭 핸들러
     const handleSeatClick = (seat) => {
@@ -79,7 +114,14 @@ function SeatSelectionPage(){
             fetchSeats();
         } catch(error){
             console.error('API call failed:', error);
-            toast.error(error.response?.data || '요청에 실패했습니다.', {position: "top-center"});
+
+            if(!isChangingSeat && error.response && error.response.status === 402){
+                toast.info('사용 가능한 이용권이 없습니다. 이용권을 먼저 구매해주세요.');
+                navigate('/tickets');
+            }
+            else{
+                toast.error(error.response?.data || '요청에 실패했습니다.', {position: "top-center"});
+            }
 
         }finally{
             handleCloseConfirm();

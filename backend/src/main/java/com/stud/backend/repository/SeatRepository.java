@@ -16,4 +16,7 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
 
     //이용중 시간이 만료된 좌석 퇴실처리
     List<Seat> findByStatusAndEndTimeBefore(SeatStatus status, LocalDateTime now);
+
+    //좌석 개수 세는 메서드
+    long countByStatus(SeatStatus status);
 }

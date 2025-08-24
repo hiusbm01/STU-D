@@ -44,11 +44,13 @@ public class SpringSecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         //로그인 회원가입 접근가능
-                        .requestMatchers("/api/users/register", "api/users/login").permitAll()
+                        .requestMatchers("/api/users/register", "api/users/login", "/ws/**").permitAll()
                         //GET요청은 인증된 사용자에게 대부분허용
                         .requestMatchers(HttpMethod.GET, "/api/**").authenticated()
                         //POST 등 요청 명시적으로 추가해주는곳
                         .requestMatchers(HttpMethod.POST, "/api/seats/**", "/api/tickets/**").authenticated()
+                        //관리자용 경로
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         //나머지 모든 요청 일단 인증 필요하도록 설정
                         .anyRequest().authenticated()
                         
