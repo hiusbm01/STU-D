@@ -5,7 +5,7 @@ import './Header.css';
 import logoImage from '../assets/akilogo.png';
 
 function Header() {
-    const {isLoggedIn, logout } =useUserStore();
+    const {isLoggedIn, logout,role } = useUserStore();
     const navigate = useNavigate();
     
     const handleLogout = () =>{
@@ -20,6 +20,9 @@ function Header() {
                 <img src={logoImage} alt="StudyCafe로고"/>
             </Link>
             <nav className="header-nav">
+                {role === "ROLE_ADMIN" && (
+                    <Link to="/admin" className="header-link">관리자</Link>
+                )}
                 {isLoggedIn ?(    
                     <button onClick={handleLogout}>로그아웃</button> 
                 ) : (null)}

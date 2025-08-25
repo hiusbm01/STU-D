@@ -13,6 +13,7 @@ public class UserTicketDto {
 
     private Long id;
     private String ticketName;
+    private String userEmail;
     private LocalDateTime purchaseDate;
     private LocalDateTime expiryDate;
     private Integer remainingTime;
@@ -21,6 +22,7 @@ public class UserTicketDto {
     public UserTicketDto(UserTicket userTicket){
         this.id = userTicket.getId();
         this.ticketName = userTicket.getTicket().getName();
+        this.userEmail = userTicket.getUser().getEmail();
         this.purchaseDate = userTicket.getPurchaseDate();
         this.expiryDate = userTicket.getExpiryDate();
         this.remainingTime = userTicket.getRemainingTime();

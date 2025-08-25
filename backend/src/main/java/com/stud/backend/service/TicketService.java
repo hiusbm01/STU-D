@@ -58,7 +58,6 @@ public class TicketService {
                 activeTicket.setExpiryDate(newExpiryDate);
             }
         }else {
-
             UserTicket userTicket = new UserTicket();
             userTicket.setUser(user);
             userTicket.setTicket(ticketToPurchase);

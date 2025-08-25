@@ -8,6 +8,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import SignupPage from './components/SignupPage';
 import TicketPurchasePage from './components/TicketPurchasePage';
 import MyPage from './components/MyPage';
+import AdminProtectedRoute from './components/AdminProtectedRoute';
+import AdminPage from './components/AdminPage';
 import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -29,6 +31,7 @@ function App(){
           <Route path="/signup" element={<SignupPage/>}/>
           <Route path="/mypage" element={<ProtectedRoute><MyPage /></ProtectedRoute>}/>
           <Route path="/tickets" element={<ProtectedRoute><TicketPurchasePage/></ProtectedRoute>}/>
+          <Route path="/admin" element={<AdminProtectedRoute><AdminPage /></AdminProtectedRoute>}/>
         </Routes>
       </main>
       <ToastContainer position="bottom-right"

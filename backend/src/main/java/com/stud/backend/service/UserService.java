@@ -61,6 +61,6 @@ public class UserService {
         Date expiryDate = new Date(now.getTime() + 360000); //1시간
 
         //JWT 토큰 반환
-        return jwtTokenProvider.generateToken(user.getEmail(), expiryDate);
+        return jwtTokenProvider.generateToken(user);
     }
 }

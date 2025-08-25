@@ -28,3 +28,14 @@
     border-radius: 4px;
     cursor: pointer;
 }
+
+.header-link {
+    margin-right: 20px;
+    text-decoration: none;
+    color : #333;
+    font-weight: 500;
+}
+
+.header-link:hover{
+    color: #007bff;
+}

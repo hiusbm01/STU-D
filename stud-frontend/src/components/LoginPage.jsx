@@ -19,7 +19,8 @@ function LoginPage(){
         try{
             const response = await apiClient.post('/users/login',{
                email, password });
-            login({email:email}, response.data.token);
+            const token = response.data.token;
+            login(token);
             
             toast.success('로그인에 성공했습니다.');
 

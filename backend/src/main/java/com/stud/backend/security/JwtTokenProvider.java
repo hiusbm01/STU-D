@@ -1,5 +1,6 @@
 package com.stud.backend.security;
 
+import com.stud.backend.domain.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -61,14 +62,18 @@ public class JwtTokenProvider {
         }
         return false;
     }
-    public String generateToken(String subject, Date expiration){
+   public String generateToken(User user){
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + 360000);
+
         return Jwts.builder()
-                .setSubject(subject) // 토큰의 주체 ex)email
-                .claim("auth","ROLE_USER")
-                .setExpiration(expiration)
-                .signWith(key, SignatureAlgorithm.HS256) //서명에 사용 할 키와 알고리즘
-                .compact(); //토큰을 압축하여 문자열로 반환.
-    }
+                .setSubject(user.getEmail())
+                .claim("auth", user.getRole().name())
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(key)
+                .compact();
+   }
 
 
 }
