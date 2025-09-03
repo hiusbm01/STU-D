@@ -39,4 +39,6 @@ public class User {
         ROLE_USER,
         ROLE_ADMIN
     }
+
+
 }
