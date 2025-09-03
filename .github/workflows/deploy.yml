@@ -45,7 +45,7 @@ jobs:
           run: |
             mkdir -p deploy
             cp backend/build/libs/*SNAPSHOT.jar deploy/application.jar
-            cd deploy && zip -r ../deploy.zip
+            cd deploy && zip -r ../deploy.zip .
             
 
         - name: Deploy to Elastic Beanstalk
