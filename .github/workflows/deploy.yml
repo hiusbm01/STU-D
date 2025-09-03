@@ -30,7 +30,7 @@ jobs:
             npm run build
         
         - name: Copy Frontend build to Spring Boot static folder
-          run: cp -r stud-frontend/build/* backend/src/main/resources/static/
+          run: cp -r stud-frontend/dist/* backend/src/main/resources/static/
 
         - name: Build Spring Boot Jar
           run: |
