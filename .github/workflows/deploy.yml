@@ -47,7 +47,7 @@ jobs:
         - name: Zip deployment package
           run: |
             mkdir -p deploy
-            cp backend/build/libs/*.jar deploy/application.jar
+            cp backend/build/libs/*SNAPSHOT.jar deploy/application.jar
             cd deploy && zip -r ../deploy.zip
             
 
