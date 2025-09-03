@@ -1,0 +1,58 @@
+name: Stud CI/CD
+
+on:
+    push:
+        branches: ["main"] #main브런치에 push되면 실행
+
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+        - name: Checkout
+          uses: actions/checkout@v3
+        
+        - name: Set up JDK 17
+          uses: actions/setup-java@v3
+          with:
+            java-version: '17'
+            distribution: 'corretto'
+
+        - name: Set up Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version: '18'
+
+        - name: Build Frontend
+          run : |
+            cd stud-frontend
+            npm install
+            npm run build
+        
+        - name: Copy Frontend build to Spring Boot static folder
+          run: cp -r stud-frontend/build/* backend/src/main/resources/static/
+
+        - name: Build Spring Boot Jar
+          run: |
+            cd backend
+            chmod +x ./gradlew
+            ./gradlew bootJar
+
+        - name: Zip deployment package
+          run: |
+            mkdir -p deploy
+            cp backend/build/libs/*.jar deploy/application.jar
+            cd deploy && zip -r ../deploy.zip
+            
+
+        - name: Deploy to Elastic Beanstalk
+          uses: einargilsson/beanstalk-deploy@v21
+          with:
+            aws_access_key : ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws_secret_key : ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            application_name: "stud"
+            environment_name: "Stud-env"
+            region: "ap-southeast-2"
+            version_label: "${{ github.sha}}"
+            deployment_package: deploy.zip
+        
