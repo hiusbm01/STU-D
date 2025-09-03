@@ -36,7 +36,7 @@ jobs:
           run: |
             cd backend
             chmod +x ./gradlew
-            ./gradlew bootJar
+            ./gradlew clean bootJar
 
         - name: Check build output
           run: ls -R backend/build
