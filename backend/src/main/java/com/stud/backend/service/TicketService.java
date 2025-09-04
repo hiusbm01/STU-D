@@ -7,6 +7,7 @@ import com.stud.backend.repository.TicketRepository;
 import com.stud.backend.repository.UserRepository;
 import com.stud.backend.repository.UserTicketRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,21 +36,30 @@ public class TicketService {
 
         Ticket ticketToPurchase = ticketRepository.findById(ticketId).orElseThrow(() -> new IllegalArgumentException("이용권을 찾을 수 없습니다"));
 
-        Optional<UserTicket> existingActiveTicket = userTicketRepository.findByUserAndStatus(user, UserTicketStatus.ACTIVE)
-                .stream()
+        TicketType purchaseType = ticketToPurchase.getType();
+        List<UserTicket> activeTickets = userTicketRepository.findByUserAndStatus(user, UserTicketStatus.ACTIVE);
+
+        //기간권을 이용중인지 확인.
+        boolean hasPeriodTicket = activeTickets.stream()
+                .anyMatch(e -> e.getTicket().getType() == TicketType.PERIOD);
+
+        //1. 기간권 사용중 -> 다른 이용권 구매불가
+        if(hasPeriodTicket) {
+            throw new IllegalStateException("이미 기간권을 사용 중입니다.");
+        }
+        //2. 다른 이용권 사용중 -> 기간권 구매 불가
+        if(purchaseType == TicketType.PERIOD && !activeTickets.isEmpty()){
+                throw new IllegalStateException("다른 활성 이용권이 존재하여 기간권을 구매할 수 없습니다.");
+        }
+
+        Optional<UserTicket> sameTypeTicket = activeTickets.stream()
+                .filter(e -> e.getTicket().getType() == purchaseType)
                 .findFirst();
 
+        if(sameTypeTicket.isPresent()){
+            UserTicket activeTicket = sameTypeTicket.get();
 
-        //ACTIVE 이용권이 이미 있는지 확인.
-        if(existingActiveTicket.isPresent()){
-            UserTicket activeTicket = existingActiveTicket.get();
-
-            //기간권 사용중이면 다른 이용권 구매 불가.
-            if(activeTicket.getTicket().getType() == TicketType.PERIOD){
-                throw new IllegalStateException("이미 기간권을 사용중입니다.");
-            }
-
-            if(ticketToPurchase.getType() == TicketType.FIXED || ticketToPurchase.getType() == TicketType.HOURLY){
+            if(purchaseType == TicketType.HOURLY || purchaseType == TicketType.FIXED){
                 int newRemainingTime = activeTicket.getRemainingTime() + (ticketToPurchase.getDurationHours() * 60);
                 activeTicket.setRemainingTime(newRemainingTime);
             }
@@ -57,22 +67,28 @@ public class TicketService {
             if(activeTicket.getExpiryDate().isBefore(newExpiryDate)){
                 activeTicket.setExpiryDate(newExpiryDate);
             }
-        }else {
-            UserTicket userTicket = new UserTicket();
-            userTicket.setUser(user);
-            userTicket.setTicket(ticketToPurchase);
-            userTicket.setPurchaseDate(LocalDateTime.now());
-            userTicket.setStatus(UserTicketStatus.ACTIVE);
 
-            if (ticketToPurchase.getType() == TicketType.PERIOD) {
-                userTicket.setExpiryDate(LocalDateTime.now().plusDays(ticketToPurchase.getDurationDays()));
-            } else {
-                userTicket.setExpiryDate(LocalDateTime.now().plusDays(ticketToPurchase.getDurationDays()));
-                userTicket.setRemainingTime(ticketToPurchase.getDurationHours() * 60);
-            }
-
-            userTicketRepository.save(userTicket);
+            userTicketRepository.save(activeTicket);
+        }  else{
+            createNewUserTicket(user, ticketToPurchase);
         }
+    }
+
+    private void createNewUserTicket(User user, Ticket ticketToPurchase){
+        UserTicket newUserTicket = new UserTicket();
+        newUserTicket.setUser(user);
+        newUserTicket.setTicket(ticketToPurchase);
+        newUserTicket.setPurchaseDate(LocalDateTime.now());
+        newUserTicket.setStatus(UserTicketStatus.ACTIVE);
+
+        if(ticketToPurchase.getType() == TicketType.PERIOD){
+            newUserTicket.setExpiryDate(LocalDateTime.now().plusDays(ticketToPurchase.getDurationDays()));
+        } else{
+            newUserTicket.setExpiryDate(LocalDateTime.now().plusDays(ticketToPurchase.getDurationDays()));
+            newUserTicket.setRemainingTime(ticketToPurchase.getDurationHours()* 60);
+        }
+
+        userTicketRepository.save(newUserTicket);
     }
 
     @Transactional(readOnly = true)
