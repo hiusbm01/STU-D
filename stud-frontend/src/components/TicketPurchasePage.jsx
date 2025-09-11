@@ -36,9 +36,17 @@ function TicketPurchasePage() {
                     'Authorization': `Bearer ${token}`
                 }
             });
+
+            alert('이용권 구매가 완료되었습니다!');
+            window.location.reload();
+
         }catch(error){
-            console.error('Failed to purchase ticket:',error);
-            alert('이용권 구매에 실패했습니다.');
+            console.error('Failed to purchase ticket:',error.response);
+            if(error.response && error.response.data && error.response.data.message){
+                alert(error.response.data.message);
+            }else{
+                alert('이용권 구매 중 오류가 발생했습니다.');
+            }
         }
     };
 
