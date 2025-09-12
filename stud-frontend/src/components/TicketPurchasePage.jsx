@@ -1,6 +1,7 @@
 import React, {useState,useEffect} from 'react';
-import axios from 'axios';
+import apiClient from '../api/api'
 import useUserStore from '../store/userStore';
+import {useNavigate} from 'react-router-dom';
 import './TicketPurchasePage.css';
 import {Button} from '@mui/material';
 import Swal from 'sweetalert2';
@@ -10,24 +11,22 @@ import 'sweetalert2/src/sweetalert2.scss';
 function TicketPurchasePage() {
     const [tickets, setTickets] = useState([]);
     const token = useUserStore((state) => state.token);
+    const isHydrated = useUserStore((state) => state.isHydrated);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchTickets = async () =>{
-            if(!token) return;
+            if( !isHydrated || !token) return;
 
             try{
-                const response = await axios.get('/api/tickets',{
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+                const response = await apiClient.get('/tickets');
                 setTickets(response.data);
             } catch(error){
-                console.error("티켓 구매에 실패:", error);
+                console.error("티켓 조회에 실패:", error);
             }
         };
         fetchTickets();
-    },[token]);
+    },[token,isHydrated]);
 
     const handlePurchase = async (ticketId) =>{
         const result = await Swal.fire({
@@ -44,32 +43,34 @@ function TicketPurchasePage() {
        if(!result.isConfirmed){
             return;
        }
+
+       let isSuccess = false;
+
         try{
-            await axios.post(`/api/tickets/${ticketId}/purchase`,{},{
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-          await Swal.fire({
-                icon: 'success',
-                title: '구매 완료!',
-                text: '이용권 구매가 완료되었습니다.'
-          });
-
-          navigate('/');
-          
-          
-
+            await apiClient.post(`/tickets/${ticketId}/purchase`, {});
+            isSuccess = true;
+        
         }catch(error){
             console.error('Failed to purchase ticket:',error.response);
-           const errorMessage = error.response?.data?.message || '이용권 구매 중 오류가 발생했습니다.';
-           await Swal.fire({
+        const errorMessage = error.response?.data?.message || '이용권 구매 중 오류가 발생했습니다.';
+        await Swal.fire({
                 icon: 'error',
                 title: '구매 실패',
                 text: errorMessage
-           });
+        });
+
         }
+        if(isSuccess){
+
+            await Swal.fire({
+                icon: 'success',
+                title: '구매 완료!',
+                text: '이용권 구매가 완료되었습니다.'
+            });
+            
+            navigate('/');
+        }
+        
     };
 
     return (
