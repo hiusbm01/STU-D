@@ -9,6 +9,7 @@ const useUserStore = create(
             token: null,
             isLoggedIn: false, //로그인 상태
             role: null,
+            isHydrated: false,
 
             login: (token) =>{
                 
@@ -24,11 +25,27 @@ const useUserStore = create(
                 });
             },
 
-            logout: () => set({user : null, token: null, isLoggedIn:false, role: null}),
+            logout: () => set({
+                user : null,
+                token: null,
+                isLoggedIn:false,
+                role: null
+            }),
+
+            setHydrated: () => {
+                set({ isHydrated: true});
+            },
+
         }),
+
+            
         {
             name: 'user-login-status',
             storage: createJSONStorage(() => localStorage),
+
+            onRehydrateStorage: () => (state) => {
+                state.setHydrated();
+            }
         }
 
     )
