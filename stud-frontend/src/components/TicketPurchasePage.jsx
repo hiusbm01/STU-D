@@ -72,6 +72,9 @@ function TicketPurchasePage() {
         }
         
     };
+    if(!isHydrated){
+        return <div> 페이지를 불러오는 중입니다..</div>
+    }
 
     return (
         <div className="ticket-purchase-container">
