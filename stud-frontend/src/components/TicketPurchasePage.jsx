@@ -55,9 +55,9 @@ function TicketPurchasePage() {
                 icon: 'success',
                 title: '구매 완료!',
                 text: '이용권 구매가 완료되었습니다.'
-          }). then(() => {
-              navigate('/');
           });
+
+          navigate('/');
           
           
 
