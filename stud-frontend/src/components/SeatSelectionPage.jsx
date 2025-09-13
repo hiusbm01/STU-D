@@ -35,10 +35,12 @@ function SeatSelectionPage() {
 
     const fetchSeatData = useCallback(async () => {
         try {
+            
             const seatsPromise = apiClient.get('/seats');
             const activeSeatPromise = apiClient.get('/seats/my-seat');
             const [seatsResponse, activeSeatResponse] = await Promise.all([seatsPromise, activeSeatPromise]);
 
+            console.log("서버에서 받은 좌석 데이터", seatsResponse.data);
             setSeats(seatsResponse.data);
             setActiveSeat(activeSeatResponse.data);
         } catch (error) {
@@ -64,7 +66,7 @@ function SeatSelectionPage() {
     }, [fetchSeatData]);
 
     const handleSeatClick = (seat) => {
-        // 내가 현재 사용 중인 좌석을 클릭한 경우
+
         if (activeSeat && activeSeat.id === seat.id) {
             toast.info('현재 사용하고 계신 좌석입니다.');
             return;
@@ -75,7 +77,7 @@ function SeatSelectionPage() {
             return;
         }
 
-        // 사용 가능한 좌석을 클릭한 경우에만 확인 다이얼로그를 띄움
+        
         setSelectedSeat(seat);
         setOpenConfirm(true);
     };

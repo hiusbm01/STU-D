@@ -7,6 +7,7 @@ import com.stud.backend.dto.SeatUsageHistoryDto;
 import com.stud.backend.service.SeatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -74,6 +75,14 @@ public class SeatController {
         return seatService.getMyRecentUsageHistory(userDetails.getUsername())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
+    }
+
+    @PostMapping("/{seatId}/change")
+    public ResponseEntity<Void> changeSeat(@PathVariable Long seatId, Authentication authentication){
+        String userEmail = authentication.getName();
+
+        seatService.changeSeat(seatId, userEmail);
+        return ResponseEntity.ok().build();
     }
 
 
