@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -199,6 +200,7 @@ public class SeatService {
     }
 
     //자리 이동 메소드
+    @Transactional
     public void changeSeat(Long newSeatId, String userEmail){
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
@@ -228,6 +230,8 @@ public class SeatService {
         oldSeat.setStartTime(null);
         oldSeat.setEndTime(null);
         oldSeat.setUserTicket(null);
+
+        seatRepository.saveAll(Arrays.asList(oldSeat, newSeat));
     }
 
     //메인메뉴 좌석개수 띄우기
