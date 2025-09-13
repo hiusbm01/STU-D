@@ -44,6 +44,7 @@ const useUserStore = create(
             storage: createJSONStorage(() => localStorage),
 
             onRehydrateStorage: () => (state) => {
+                console.log(' zustand 데이터 복구 완료!');
                 state.setHydrated();
             }
         }

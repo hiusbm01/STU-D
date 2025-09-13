@@ -9,16 +9,23 @@ import 'sweetalert2/src/sweetalert2.scss';
 
 
 function TicketPurchasePage() {
+    console.log('---TicketPurchasePage 컴포넌트 렌더링');
     const [tickets, setTickets] = useState([]);
     const token = useUserStore((state) => state.token);
     const isHydrated = useUserStore((state) => state.isHydrated);
     const navigate = useNavigate();
+    console.log('현재 상태:', { isHydrated, token});
 
     useEffect(() => {
         const fetchTickets = async () =>{
-            if( !isHydrated || !token) return;
+            console.log('useEffect 실행. API호출 시도');
+            if( !isHydrated || !token) {
+                console.log('조건 불충족으로 api 호출 안함.');
+                return;
+            };
 
             try{
+                console.log('api 호출 직전 토큰 :', token);
                 const response = await apiClient.get('/tickets');
                 setTickets(response.data);
             } catch(error){
