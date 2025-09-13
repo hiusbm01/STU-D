@@ -14,7 +14,7 @@ import SockJS from 'sockjs-client/dist/sockjs';
 const calculateRemainingTime = (endTimeString) => {
     if (!endTimeString) return '';
     const now = new Date();
-    const endTime = new Date(endTimeString);
+    const endTime = new Date(endTimeString + 'Z');
     const diffMs = endTime - now;
 
     if (diffMs > 0) {
