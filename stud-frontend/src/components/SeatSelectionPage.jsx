@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
 import { toast } from 'react-toastify'; // ✨ 1. toast를 다시 import 합니다.
 import Swal from 'sweetalert2';
+import '/SeatSelectionPage.css';
 import 'sweetalert2/dist/sweetalert2.min.css';
 
 import { Client } from '@stomp/stompjs';
