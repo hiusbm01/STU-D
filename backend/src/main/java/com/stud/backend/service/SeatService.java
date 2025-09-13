@@ -81,14 +81,21 @@ public class SeatService {
         if(seat.getStatus() != SeatStatus.AVAILABLE){
             throw new IllegalStateException("이미 사용 중이거나 예약 불가능한 좌석입니다.");
         }
+
+        int remainingMinutes = ticketToUse.getRemainingTime();
+        if(remainingMinutes <= 0){
+            throw new IllegalStateException("이용권의 남은 시간이 없습니다");
+        }
+
         //좌석 정보 업데이트
         seat.setStatus(SeatStatus.OCCUPIED); //상태 사용중으로 변경
         seat.setUser(user); //좌석에 사용자 정보 연결
         seat.setUserTicket(ticketToUse);
         seat.setStartTime(LocalDateTime.now()); //시작 시간 기록
-        seat.setEndTime(LocalDateTime.now().plusHours(2)); //2시간 후를 종료 시간으로 설정 (임시)
+        seat.setEndTime(LocalDateTime.now().plusMinutes(remainingMinutes)); //2시간 후를 종료 시간으로 설정 (임시)
 
         broadcastSeatUpdate();
+        seatRepository.save(seat);
 
     }
     //퇴실
