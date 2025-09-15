@@ -3,7 +3,7 @@ import { Box, Container, Grid, Typography, Paper } from '@mui/material';
 
 import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
 import WifiIcon from '@mui/icons-material/Wifi';
-import CoffeMakerIcon from '@mui/icons-material/CoffeeMaker';
+import CoffeeMakerIcon from '@mui/icons-material/CoffeeMaker';
 import ChairIcon from '@mui/icons-material/Chair';
 
 const features = [
@@ -41,7 +41,7 @@ function FeatureSection(){
 
                 <Grid container spacing={4}>
                     {features.map((feature) => (
-                        <Grid item xs={12} sx={6} md={3} key={feature.title}>
+                        <Grid item xs={12} sm={6} md={3} key={feature.title}>
                             <Paper elevation={0} sx={{ textAlign: 'center', p: 4, borderRadius: 2}}>
                                 <Box color="primary.main" mb={2}>
                                     {feature.icon}
