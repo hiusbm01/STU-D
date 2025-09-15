@@ -92,7 +92,7 @@ public class SeatService {
         seat.setUser(user); //좌석에 사용자 정보 연결
         seat.setUserTicket(ticketToUse);
         seat.setStartTime(LocalDateTime.now()); //시작 시간 기록
-        seat.setEndTime(LocalDateTime.now().plusMinutes(remainingMinutes)); //2시간 후를 종료 시간으로 설정 (임시)
+        seat.setEndTime(LocalDateTime.now().plusMinutes(remainingMinutes)); //이용권 시간 만큼 종료 시간 증가
 
         broadcastSeatUpdate();
         seatRepository.save(seat);

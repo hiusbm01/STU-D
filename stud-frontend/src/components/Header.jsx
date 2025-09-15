@@ -1,8 +1,9 @@
 import React from 'react';
-import { Link, useNavigate} from 'react-router-dom';
+import { Link as RouterLink, useNavigate} from 'react-router-dom';
 import useUserStore from '../store/userStore';
-import './Header.css';
 import logoImage from '../assets/akilogo.png';
+import { AppBar, Toolbar, Button, Box} from '@mui/material';
+import { toast } from 'react-toastify';
 
 function Header() {
     const {isLoggedIn, logout,role } = useUserStore();
@@ -10,24 +11,45 @@ function Header() {
     
     const handleLogout = () =>{
         logout();
-        alert('로그아웃 되었습니다.');
+        toast.success('로그아웃 되었습니다.');
         navigate('/login');
     };
     
     return (
-        <header className="header">
-            <Link to="/" className="header-logo">
-                <img src={logoImage} alt="StudyCafe로고"/>
-            </Link>
-            <nav className="header-nav">
-                {role === "ROLE_ADMIN" && (
-                    <Link to="/admin" className="header-link">관리자</Link>
-                )}
-                {isLoggedIn ?(    
-                    <button onClick={handleLogout}>로그아웃</button> 
-                ) : (null)}
-            </nav>
-        </header>
+        <AppBar position="static" sx={{ backgroundColor: 'white' }} elevation={1}>
+            <Toolbar>
+                <RouterLink to ="/">
+                    <Box component="img"
+                         src={logoImage}
+                         alt="StudyCafe로고"
+                         sx={{ height: 40, display: 'block'}}
+                    />
+                </RouterLink>
+                    <Box sx={{ marginLeft: 4}}>
+                        <Button component={RouterLink} to="/" sx={{color: 'black'}}>Home</Button>
+                        <Button component={RouterLink} to="/seats" sx={{color: 'black'}}>Seats</Button>
+                        <Button component={RouterLink} to="/tickets" sx={{color: 'black'}}>Tickets</Button>
+                    </Box>
+                    
+                    <Box sx={{ flexGrow: 1}}/>
+
+                    <Box>
+                        {isLoggedIn ? (
+                            <>
+                                {role === "ROLE_ADMIN" && (
+                                    <Button component={RouterLink} to="/admin" sx={{ color: 'black'}}>관리자</Button>
+                                )}
+                                <Button variant="outlined" onClick={handleLogout} sx={{ color: 'black'}}>로그아웃</Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button component={RouterLink} to="/login" sx={{color: 'black'}}>로그인</Button>
+                            </>
+                        )}
+                    </Box>
+            </Toolbar>
+        </AppBar>
+    
     );
 }
 
