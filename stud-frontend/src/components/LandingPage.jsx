@@ -5,9 +5,7 @@ import FeatureSection from '../components/FeatureSection';
 function LandingPage(){
     return (
         <div>
-            <Header />
-
-            <FeatureSection/>
+           <FeatureSection/>
         </div>
     );
 }
