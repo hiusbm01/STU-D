@@ -2,6 +2,7 @@ import { Routes, Route} from 'react-router-dom';
 import Header from './components/Header';
 import LoginPage from './components/LoginPage';
 import MainPage from './components/MainPage';
+import useUserStore from './store/userStore';
 import './App.css';
 import SeatSelectionPage from './components/SeatSelectionPage';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -11,19 +12,27 @@ import MyPage from './components/MyPage';
 import AdminProtectedRoute from './components/AdminProtectedRoute';
 import AdminPage from './components/AdminPage';
 import {ToastContainer} from 'react-toastify';
+import LandingPage from './components/LandingPage';
 import 'react-toastify/dist/ReactToastify.css';
 
+
+
 function App(){
+  const { isLoggedIn} = useUserStore();
+
   return (
     <div>
       <Header />
       <main>
         <Routes>
           <Route path="/"
-            element={
-            <ProtectedRoute>
+            element={ isLoggedIn ? (
+              <ProtectedRoute>
                 <MainPage />
             </ProtectedRoute>
+            ) : (
+              <LandingPage />
+            )
             }
           />
           <Route path="/seats" element={<ProtectedRoute><SeatSelectionPage/></ProtectedRoute>}/>
