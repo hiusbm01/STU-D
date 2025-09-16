@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from 'react';
-import apiClient from '../api/apiClient';
+import apiClient from '../api/api';
 import useUserStore from '../store/userStore';
 import {useNavigate} from 'react-router-dom';
 
