@@ -9,8 +9,23 @@ import { createTheme, ThemeProvider} from '@mui/material/styles';
 const theme = createTheme({
   typography: {
     fontFamily : "'Noto Sans KR', sans-serif",
-  }
-})
+
+    h1: { fontFamily: "'Lora', serif"},
+    h2: { fontFamily: "'Lora', serif"},
+    h3: { fontFamily: "'Lora', serif"},
+    h4: { fontFamily: "'Lora', serif"},
+  },
+  palette: {
+    primary: {
+      main: '#333D29',
+    },
+    background : {
+      default: '#f8f6f2',
+      paper: '#ffffff',
+    },
+  },
+});
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
       <BrowserRouter>
@@ -22,4 +37,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </React.StrictMode>,
 
 
-)
+);
