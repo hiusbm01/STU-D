@@ -25,11 +25,20 @@ public class TicketService {
     private final UserRepository userRepository;
     private final UserTicketRepository userTicketRepository;
 
-    @Transactional(readOnly = true)
-    public List<TicketDto> getAllTickets(){
-        return ticketRepository.findAll().stream().map(TicketDto::new).collect(Collectors.toList());
+   @Transactional(readOnly = true)
+   public List<TicketDto> findAvailableTickets(TicketType ticketType){
+       List<Ticket> tickets;
 
-    }
+       if(ticketType == null){
+           tickets = ticketRepository.findAll();
+       } else {
+           tickets = ticketRepository.findByType(ticketType);
+       }
+
+       return tickets.stream()
+               .map(TicketDto :: new)
+               .collect(Collectors.toList());
+   }
 
     public void purchaseTicket(Long ticketId, String userEmail){
         User user = userRepository.findByEmail(userEmail).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));

@@ -135,8 +135,10 @@ public class SeatService {
         seat.setUser(null);
         seat.setStartTime(null);
         seat.setEndTime(null);
+        seat.setUserTicket(null);
         //@Transactional에 의해 변경된 Seat와 UserTicket의 정보가 자동으로 DB저장.
 
+        seatRepository.save(seat);
         broadcastSeatUpdate();
 
         return new CheckoutResponseDto(duration, activeUserTicket);

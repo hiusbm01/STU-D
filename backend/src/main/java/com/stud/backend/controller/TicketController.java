@@ -1,6 +1,7 @@
 package com.stud.backend.controller;
 
 
+import com.stud.backend.domain.TicketType;
 import com.stud.backend.dto.TicketDto;
 import com.stud.backend.dto.UserTicketDto;
 import com.stud.backend.service.TicketService;
@@ -20,8 +21,16 @@ public class TicketController {
     private final TicketService ticketService;
 
     @GetMapping
-    public ResponseEntity<List<TicketDto>> getAllTickets(){
-        List<TicketDto> tickets = ticketService.getAllTickets();
+    public ResponseEntity<List<TicketDto>> getTickets(@RequestParam(name ="type", required = false) String type){
+        TicketType ticketType = null;
+        if(type != null){
+            try{
+                ticketType = TicketType.valueOf(type.toUpperCase());
+            }catch( IllegalArgumentException e){
+                return ResponseEntity.badRequest().build();
+            }
+        }
+        List<TicketDto> tickets = ticketService.findAvailableTickets(ticketType);
         return ResponseEntity.ok(tickets);
     }
 
