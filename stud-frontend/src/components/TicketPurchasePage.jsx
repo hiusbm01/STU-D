@@ -124,9 +124,7 @@ function TicketPurchasePage() {
                                         {ticket.name}
                                     </Typography>
                                     <Typography color="text.secondary">
-                                        {ticket.type === 'PERIOD' && `${ticket.durationDays}일 기간권`}
-                                        {ticket.type === 'FIXED' && `${ticket.durationHours}시간 정액권(유효기간 ${ticket.durationDays}일)`}
-                                        {ticket.type === 'HOURLY' && `${ticket.durationHours}시간`}
+                                        {ticket.type === 'FIXED' && `유효기간 ${ticket.durationDays}일`}
                                     </Typography>
                                     <Typography variant="h4" component="p" sx={{ my:2 , fontWeight: 'bold'}}>
                                         {ticket.price.toLocaleString()}원
