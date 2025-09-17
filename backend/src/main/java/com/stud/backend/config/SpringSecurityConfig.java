@@ -50,7 +50,7 @@ public class SpringSecurityConfig {
                             .requestMatchers("/", "/index.html", "/favicon.ico", "/assets/**").permitAll()
 
                             //로그인 회원가입 접근가능
-                            .requestMatchers("/api/users/register", "/api/users/login", "/ws/**").permitAll()
+                            .requestMatchers("/api/users/register", "/api/users/login","/api/users/check-email", "/ws/**").permitAll()
                             .requestMatchers("/login","/register","/tickets","/seats","/my-page","admin/**").permitAll()
                             //GET요청은 인증된 사용자에게 대부분허용
                             .requestMatchers(HttpMethod.GET, "/api/public/**").permitAll()
