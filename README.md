@@ -55,9 +55,6 @@
 
 ### 👨‍💻 담당 역할 상세
 
-<details>
-<div markdown="1">
-
 **Backend**
 - Spring Security와 JWT를 이용한 인증/인가 시스템 구현
 - Spring Data JPA를 활용한 데이터베이스 연동 및 비즈니스 로직 개발
@@ -75,7 +72,6 @@
 - GitHub Actions를 이용한 CI/CD 파이프라인 구축 (자동 빌드 및 배포)
 - AWS Elastic Beanstalk, RDS를 활용한 프로젝트 배포 및 관리
 
-</div>
-</details>
+
 
 ---
