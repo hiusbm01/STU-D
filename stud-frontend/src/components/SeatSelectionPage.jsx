@@ -9,22 +9,9 @@ import 'sweetalert2/dist/sweetalert2.min.css';
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client/dist/sockjs';
 import {seatData} from '../data/seatData';
+import SeatMap from './SeatMap';
 
-// 남은 시간을 계산하는 함수
-const calculateRemainingTime = (endTimeString) => {
-    if (!endTimeString) return '';
-    const now = new Date();
-    const endTime = new Date(endTimeString + 'Z');
-    const diffMs = endTime - now;
 
-    if (diffMs > 0) {
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        return `${diffHours}시간 ${diffMinutes}분 남음`;
-    } else {
-        return '만료됨';
-    }
-};
 
 function SeatSelectionPage() {
     const [seats, setSeats] = useState([]);
