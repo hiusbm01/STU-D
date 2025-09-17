@@ -26,5 +26,14 @@ public class GlobalExceptionHandler {
         errorResponse.put("message", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(TicketNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleTicketNotFoundExcpetion(TicketNotFoundException ex){
+        Map<String, String> response = new HashMap<>();
+
+        response.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.PAYMENT_REQUIRED);
+
+    }
 
 }

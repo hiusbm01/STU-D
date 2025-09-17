@@ -39,18 +39,6 @@ public class SeatService {
     }
 
 
-    @PostConstruct
-    public void initSeats(){
-        //시작 시 테스트용 좌석 생성 로직
-        if(seatRepository.count() == 0){
-            for(int i=1; i<=10; i++){
-                Seat seat = new Seat();
-                seat.setSeatNumber("A" + i);
-                seat.setStatus(SeatStatus.AVAILABLE);
-                seatRepository.save(seat);
-            }
-        }
-    }
     @Transactional(readOnly = true)
     public List<SeatDto> getAllSeats(){
         return seatRepository.findAll().stream()
