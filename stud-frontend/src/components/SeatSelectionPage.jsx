@@ -2,13 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import apiClient from '../api/api';
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
-import { toast } from 'react-toastify'; // ✨ 1. toast를 다시 import 합니다.
+import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
-import './SeatSelectionPage.css';
 import 'sweetalert2/dist/sweetalert2.min.css';
 
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client/dist/sockjs';
+import {seatData} from '../data/seatData';
 
 // 남은 시간을 계산하는 함수
 const calculateRemainingTime = (endTimeString) => {
@@ -36,12 +36,18 @@ function SeatSelectionPage() {
     const fetchSeatData = useCallback(async () => {
         try {
             
-            const seatsPromise = apiClient.get('/seats');
-            const activeSeatPromise = apiClient.get('/seats/my-seat');
-            const [seatsResponse, activeSeatResponse] = await Promise.all([seatsPromise, activeSeatPromise]);
+            const seatsResponse = await apiClient.get('/seats');
+            const activeSeatResponse = await apiClient.get('/seats/my-seat');
 
-            console.log("서버에서 받은 좌석 데이터", seatsResponse.data);
-            setSeats(seatsResponse.data);
+            const liveSeats = seatsResponse.data;
+            const mergedSeats = seatData.map(layoutSeat => {
+                if(layoutSeat.type === 'seat'){
+                    const liveSeat = liveSeats.find(s => s.seatNumber === layoutSeat.seatNumber);
+                    return liveSeat ? {...layoutSeat, ... liveSeat} : layoutSeat;
+                }
+                return layoutSeat;
+            })
+            setSeats(mergedSeats);
             setActiveSeat(activeSeatResponse.data);
         } catch (error) {
             if (error.response?.status !== 404) {
@@ -56,7 +62,15 @@ function SeatSelectionPage() {
             webSocketFactory: () => new SockJS('/ws'),
             onConnect: () => {
                 stompClient.subscribe('/topic/seats', (message) => {
-                    setSeats(JSON.parse(message.body));
+                  const liveSeats = JSON.parse(message.body);
+                  const mergedSeats = seatData.map(layoutSeat => {
+                    if(layoutSeat.type === 'seat'){
+                        const liveSeat = liveSeats.find(s => s.seatNumber === layoutSeat.seatNumber);
+                        return liveSeat ? {...layoutSeat, ...liveSeat} : layoutSeat;
+                    }
+                    return layoutSeat;
+                  });
+                  setSeats(mergedSeats);
                 });
             },
             onStompError: (frame) => console.error('STOMP Error:', frame),
@@ -119,16 +133,11 @@ function SeatSelectionPage() {
     return (
         <div>
             <h1>좌석 선택</h1>
-            <div className="seat-grid-container">
-                {seats.map((s) => (
-                    <div key={s.id} className={`seat ${s.status.toLowerCase()}`} onClick={() => handleSeatClick(s)}>
-                        <h3>{s.seatNumber}</h3>
-                        <p>
-                            {s.status === 'AVAILABLE' ? '사용 가능' : calculateRemainingTime(s.endTime)}
-                        </p>
-                    </div>
-                ))}
-            </div>
+            <SeatMap seats={seats}
+                     activeSeatId={activeSeat?.id}
+                     selectedSeatId={selectedSeat?.id}
+                     onSeatClick={handleSeatClick}
+            />
 
             <Dialog open={openConfirm} onClose={handleCloseConfirm}>
                 <DialogTitle>{activeSeat ? '자리 이동 확인' : '좌석 예약 확인'}</DialogTitle>

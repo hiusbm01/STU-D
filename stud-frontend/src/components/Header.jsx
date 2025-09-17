@@ -38,7 +38,6 @@ function Header() {
                     <Button component={RouterLink} to="/" sx={{ color: 'text.primary' }}>Home</Button>
                     <Button component={RouterLink} to="/seats" sx={{ color: 'text.primary' }}>Seats</Button>
                     <Button component={RouterLink} to="/tickets" sx={{ color: 'text.primary' }}>Tickets</Button>
-                    <Button component={RouterLink} to="/about" sx={{ color: 'text.primary' }}>About Us</Button>
                 </Box>
 
                 <Box sx={{ flexGrow: 1 }} />

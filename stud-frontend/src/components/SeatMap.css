@@ -1,0 +1,65 @@
+.seat-map-container {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: repeat(12. 40px);
+    gap: 8px;
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 800px;
+    margin: 20px auto;
+    border: 1px solid #ddd;
+
+}
+
+.map-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.seat {
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.seat-available{
+    background-color: #ffffff;
+    border: 1px solid #b0bec5;
+    color: #37474f;
+}
+.seat-available:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.seat-occupied {
+    background-color: #78909c;
+    color: white;
+    cursor: not-allowed;
+}
+
+.seat-selected{
+    background-color: #ffca28;
+    border: 2px solid #ffa000;
+    transform: scale(1.1);
+}
+
+.label{
+    background-color: transparent;
+    font-size: 16px;
+    color: #546e7a;
+    grid-column: span 2;
+}
+
+.legend-box {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin-right: 8px;
+    border-radius: 3px;
+    vertical-align: middle;
+}
