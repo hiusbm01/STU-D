@@ -64,7 +64,7 @@ function Header() {
                             <Button component={RouterLink} to="/login" sx={{ color: 'text.primary' }}>
                                 로그인
                             </Button>
-                            <Button component={RouterLink} to="/register" variant="contained" sx={{ marginLeft: 2 }}>
+                            <Button component={RouterLink} to="/signup" variant="contained" sx={{ marginLeft: 2 }}>
                                 회원가입
                             </Button>
                         </>

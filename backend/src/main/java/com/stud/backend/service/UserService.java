@@ -42,6 +42,10 @@ public class UserService {
 
         return userRepository.save(newUser);
     }
+    @Transactional(readOnly = true)
+    public boolean isEmailAvailable(String email){
+        return !userRepository.existsByEmail(email);
+    }
 
     //로그인 메서드
     public String login(String email, String password){

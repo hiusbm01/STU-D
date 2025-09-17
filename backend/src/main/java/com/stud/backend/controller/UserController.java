@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -31,6 +32,14 @@ public class UserController {
             return new ResponseEntity<>("회원가입 중 오류가 발생했습니다.",HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+    }
+    @GetMapping("/check-email")
+    public ResponseEntity<Map<String,Boolean>> checkEmail(@RequestParam String email){
+        boolean isAvailable = userService.isEmailAvailable(email);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isAvailable", isAvailable);
+
+        return ResponseEntity.ok(response);
     }
     
     @PostMapping("/login")
