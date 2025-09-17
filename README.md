@@ -56,7 +56,6 @@
 ### 👨‍💻 담당 역할 상세
 
 <details>
-<summary><strong>자세히 보기 (Click to expand)</strong></summary>
 <div markdown="1">
 
 **Backend**
@@ -64,7 +63,6 @@
 - Spring Data JPA를 활용한 데이터베이스 연동 및 비즈니스 로직 개발
 - WebSocket(STOMP)을 이용한 실시간 좌석 정보 동기화 기능 구현
 - 이용권 종류별(시간권, 정액권, 기간권) 구매 및 사용 로직 구현
-- Custom Exception 및 @RestControllerAdvice를 이용한 체계적인 예외 처리
 
 **Frontend**
 - React와 Material-UI를 사용한 반응형 UI/UX 설계 및 개발
