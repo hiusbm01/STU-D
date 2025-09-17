@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import apiClient from '../api/api';
 import { useNavigate } from 'react-router-dom';
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Box, Typography} from '@mui/material';
 import { toast } from 'react-toastify';
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
@@ -118,8 +118,11 @@ function SeatSelectionPage() {
     };
 
     return (
-        <div>
-            <h1>좌석 선택</h1>
+        <Box sx={{ p: 4}}>
+            <Typography variant="h4" component="h1" align="center" asx={{ fontWeight:'bold', mb:4}}>
+                좌석 선택
+            </Typography>
+            
             <SeatMap seats={seats}
                      activeSeatId={activeSeat?.id}
                      selectedSeatId={selectedSeat?.id}
@@ -138,7 +141,7 @@ function SeatSelectionPage() {
                     <Button onClick={handleConfirm} autoFocus>{activeSeat ? '이동' : '예약'}</Button>
                 </DialogActions>
             </Dialog>
-        </div>
+        </Box>
     );
 }
 
