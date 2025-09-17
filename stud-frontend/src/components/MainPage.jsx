@@ -79,7 +79,7 @@ function MainPage(){
                         <span>{new Date(recentHistory.checkOutTime).toLocaleString('ko-KR')}[퇴실]</span>
                     </div>
                     <div className="usage-status-body">
-                        최근에 {recentHistory.seatNumber} 좌석을 {recentHistory.durationMinutes }분 이용했습니다.
+                        최근에 {recentHistory.seatNumber}번 좌석을 {recentHistory.durationMinutes }분 이용했습니다.
                     </div>
                 </div>
             )}
