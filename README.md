@@ -1,5 +1,7 @@
 # 💻 프로젝트: STU-D
 
+http://stud-env.eba-ywmej3a8.ap-southeast-2.elasticbeanstalk.com/
+
 > Spring Boot와 React를 사용하여 구현한 실시간 스터디카페 좌석 예약 및 이용권 관리 웹 애플리케이션입니다.
 ---
 
