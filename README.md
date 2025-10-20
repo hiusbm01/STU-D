@@ -52,11 +52,11 @@
 - **CSS Grid로 동적 좌석 배치도 구현**
     - 좌석 상태(사용 가능/예약/사용 중) 직관적 시각화
 
-![Animation.gif](attachment:7a2d6eb1-6118-4799-a1e4-a6ee070f4b54:Animation.gif)
+<img width="2306" height="1187" alt="image" src="https://github.com/user-attachments/assets/1862cf84-aa98-4f91-b233-4e88f365eb94" />
+
 
 - **현재 좌석 및 최근 이용 기록 대시보드 제공**
-
-![스크린샷 2025-09-19 124801.png](attachment:12fffc11-f842-4570-b709-0a194f5ca1e6:스크린샷_2025-09-19_124801.png)
+<img width="2469" height="826" alt="image" src="https://github.com/user-attachments/assets/2d0ce17a-9bbd-43cb-9166-fb8cb8b56c79" />
 
 ---
 
