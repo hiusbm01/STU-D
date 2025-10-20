@@ -45,21 +45,6 @@
 
 ---
 
-## 🚀 중요 기능 시연
-
-- **웹소켓 기반 실시간 좌석 예약**
-    - 여러 사용자가 동시에 예약해도 충돌 없이 처리
-- **CSS Grid로 동적 좌석 배치도 구현**
-    - 좌석 상태(사용 가능/예약/사용 중) 직관적 시각화
-
-<img width="2306" height="1187" alt="image" src="https://github.com/user-attachments/assets/1862cf84-aa98-4f91-b233-4e88f365eb94" />
-
-
-- **현재 좌석 및 최근 이용 기록 대시보드 제공**
-<img width="2469" height="826" alt="image" src="https://github.com/user-attachments/assets/2d0ce17a-9bbd-43cb-9166-fb8cb8b56c79" />
-
----
-
 ### TROUBLE SHOOTING
 
 ## 🐞 문제 상황
@@ -102,7 +87,8 @@
 
 - `vite.config.js` 프록시 설정 수정 후 서버 재시작
 
-![스크린샷 2025-09-19 123124.png](attachment:ba60d185-3901-418d-99cb-3231fba9de82:스크린샷_2025-09-19_123124.png)
+<img width="964" height="582" alt="image" src="https://github.com/user-attachments/assets/80ce8e47-0340-4710-bdad-83ae19a06dd1" />
+
 
 - API 호출 시 정상적으로 JSON 응답 반환 🎉
 
@@ -139,7 +125,8 @@ const response = await axios.get('/api/...', {
 3. Zustand 스토어에서 토큰 자동 가져와 모든 요청 헤더에 삽입
 4. 컴포넌트에서는 단순히 `apiClient.get('/경로')`만 사용
 
-![스크린샷 2025-09-19 151525.png](attachment:65be181a-99c1-4f0e-b76a-5a837d10f107:스크린샷_2025-09-19_151525.png)
+<img width="1331" height="541" alt="image" src="https://github.com/user-attachments/assets/8c1ea9a4-1a21-47bd-ab09-3b564b5aa863" />
+
 
 ### 결과
 
