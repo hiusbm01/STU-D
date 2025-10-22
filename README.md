@@ -41,7 +41,7 @@
 - **GitHub Actions를 통한 CI/CD**
     - 코드 push → 자동 빌드 및 배포
 - **AWS Elastic Beanstalk + RDS**
-    - 안정적인 서버 운영 및 데이터베이스 관리
+    - 안정적인 서버 운영 및 데이터베이스 관리(비용 문제로 배포 중단)
 
 ---
 
