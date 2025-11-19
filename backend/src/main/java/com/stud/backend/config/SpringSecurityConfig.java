@@ -71,7 +71,7 @@ public class SpringSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration configuration = new CorsConfiguration();
         //프론트 서버 주소 허용
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173","http://13.236.159.92"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173","http://localhost:8080"));
         //허용할 HTTP 메서드 설정
         configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));
         //헤더 설정

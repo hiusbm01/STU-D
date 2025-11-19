@@ -9,6 +9,7 @@ import com.stud.backend.repository.UserRepository;
 import com.stud.backend.repository.UserTicketRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @Transactional
 @RequiredArgsConstructor
 public class SeatService {
@@ -47,6 +49,7 @@ public class SeatService {
     }
 
     public void reserveSeat(Long seatId, String userEmail){
+        log.info("reserveSeat called. seatId={}, userEmail={}", seatId, userEmail);
         //예약하려는 좌석 조회
         Seat seat = seatRepository.findById(seatId)
                 .orElseThrow(() ->new IllegalArgumentException("해당 좌석이 존재하지 않습니다."));

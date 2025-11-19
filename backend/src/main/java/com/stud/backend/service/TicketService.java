@@ -91,6 +91,9 @@ public class TicketService {
         newUserTicket.setStatus(UserTicketStatus.ACTIVE);
 
         if(ticketToPurchase.getType() == TicketType.PERIOD){
+            int totalMinutes = ticketToPurchase.getDurationDays() * 24 * 60;
+
+            newUserTicket.setRemainingTime(totalMinutes);
             newUserTicket.setExpiryDate(LocalDateTime.now().plusDays(ticketToPurchase.getDurationDays()));
         } else{
             newUserTicket.setExpiryDate(LocalDateTime.now().plusDays(ticketToPurchase.getDurationDays()));

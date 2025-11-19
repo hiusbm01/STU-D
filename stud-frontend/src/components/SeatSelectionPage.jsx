@@ -46,7 +46,7 @@ function SeatSelectionPage() {
     useEffect(() => {
         fetchSeatData();
         const stompClient = new Client({
-            webSocketFactory: () => new SockJS('/ws'),
+            webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
             onConnect: () => {
                 stompClient.subscribe('/topic/seats', (message) => {
                   const liveSeats = JSON.parse(message.body);

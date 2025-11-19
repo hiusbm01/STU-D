@@ -22,7 +22,7 @@ export const seatData = [
   { id: 'label-cafe', type: 'label', text: 'Cafe Zone', gridRow: 5, gridColumn: 7, gridColumnEnd: 10 },
   { id: 11, type: 'seat', seatNumber: '11', status: 'AVAILABLE', gridRow: 6, gridColumn: 8 },
   { id: 12, type: 'seat', seatNumber: '12', status: 'AVAILABLE', gridRow: 6, gridColumn: 9 },
-  { id: 13, type: 'seat', seatNumber: '13', status: 'AVAILALBE', gridRow: 7, gridColumn: 8 },
+  { id: 13, type: 'seat', seatNumber: '13', status: 'AVAILABLE', gridRow: 7, gridColumn: 8 },
   { id: 14, type: 'seat', seatNumber: '14', status: 'AVAILABLE', gridRow: 7, gridColumn: 9 },
 
   // 5열
